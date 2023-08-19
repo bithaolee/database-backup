@@ -1,11 +1,15 @@
 # Automatically Schedule Database Backup to Local Disk and S3
 
+## Pre requisite
+
+- mysqldump
+
 ## Installation
 
 ```shell
-pnpm install
 copy .env.sample .env
 copy .db.ini.sample .db.ini
+pnpm install
 ```
 
 ## Commanders
@@ -13,8 +17,8 @@ copy .db.ini.sample .db.ini
 ### List the latest n database backups
 
 ```shell
-./index.js backup
-./index.js backup -n 20
+./index.js backup -d [dbName]
+./index.js backup -d [dbName] -n 20
 ```
 
 ### Create a database backup
