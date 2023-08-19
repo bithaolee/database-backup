@@ -6,6 +6,7 @@ import { spawn } from "child_process";
 import { Command } from "commander";
 import config from "../config.js";
 import { error, info, success, warning } from "../log.js";
+import s3Handle from "../s3.js";
 
 const program = new Command();
 program.parse(process.argv);
@@ -46,7 +47,11 @@ async function backupDatabase(dbName) {
 
   mysqldump.on("exit", (code) => {
     if (code === 0) {
-      success(`Backup database success, ${dumpFileName}`);
+      success(`Successfully backup to local disk: ${dumpFileName}`);
+
+      s3Handle(dumpFileName);
+
+      autoRemoveOldBackups(dbBackupPath);
     } else {
       error(`Backup database failed`);
     }
@@ -55,8 +60,9 @@ async function backupDatabase(dbName) {
   mysqldump.on("error", (err) => {
     error(`Backup database failed, ${err.stack}`);
   });
+}
 
-  // auto remove old backup files
+async function autoRemoveOldBackups(dbBackupPath) {
   const files = await fs.readdirSync(dbBackupPath);
   const fileStats = await Promise.all(
     files
