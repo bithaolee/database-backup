@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { Command } from "commander";
 import Table from "cli-table3";
 import { filesize } from "filesize";
@@ -7,32 +8,36 @@ import { error, info } from "../log.js";
 
 const program = new Command();
 
-program.requiredOption(
-  "-n, --number <Number of backups>",
-  "List number of backups"
-);
+program
+  .requiredOption("-d, --database <Database Name>", "Specific database")
+  .requiredOption(
+    "-n, --number <Number of backups>",
+    "List number of backups",
+    20
+  );
 program.parse(process.argv);
 
 const opts = program.opts();
 
 const directory = config.disk.directory;
 
-const exists = await fs.existsSync(directory);
+const dbBackupPath = path.join(directory, opts.database);
+const exists = await fs.existsSync(dbBackupPath);
 if (!exists) {
-  error(`Backup directory(${directory}) does not exists`);
+  error(`Backup directory(${dbBackupPath}) does not exists`);
   process.exit(0);
 }
 
 try {
-  const files = await fs.readdirSync(directory);
+  const files = await fs.readdirSync(dbBackupPath);
 
   const fileStats = await Promise.all(
     files
       .filter((file) => file.startsWith(config.prefix))
       .map(async (file) => {
-        const filePath = `${directory}/${file}`;
+        const filePath = path.join(dbBackupPath, file);
         const stats = await fs.statSync(filePath);
-        return { file, stats };
+        return { file, filePath, stats };
       })
   );
 
