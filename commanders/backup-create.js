@@ -16,7 +16,7 @@ const dumpFileName = path.join(
 );
 
 const mysqldump = spawn("mysqldump", [
-  "--defaults-file=./db.ini",
+  "--defaults-file=./.db.ini",
   ...config.databases,
 ]);
 
