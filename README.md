@@ -22,3 +22,10 @@ copy .db.ini.sample .db.ini
 ```shell
 ./index.js backup create
 ```
+
+## Deploy to Crontab
+
+```crontab
+0 12 * * * /path/to/index.js create
+0 0 * * * /path/to/index.js create
+```
