@@ -20,10 +20,18 @@ const mysqldump = spawn("mysqldump", [
   ...config.databases,
 ]);
 
+const writeStream = fs.createWriteStream(dumpFileName);
+mysqldump.stdout.pipe(writeStream).on("data", (data) => {
+  console.log(data.toString());
+});
+
+mysqldump.stderr.on("data", (data) => {
+  console.log(data);
+  error(data.toString());
+});
+
 mysqldump.on("exit", (code) => {
   if (code === 0) {
-    const writeStream = fs.createWriteStream(dumpFileName);
-    mysqldump.stdout.pipe(writeStream);
     info(`Backup database success`);
   } else {
     error(`Backup database failed`);
@@ -32,10 +40,6 @@ mysqldump.on("exit", (code) => {
 
 mysqldump.on("error", (err) => {
   error(`Backup database failed, ${err.stack}`);
-});
-
-mysqldump.stderr.on("data", (data) => {
-  error(data.toString());
 });
 
 program.parse(process.argv);
