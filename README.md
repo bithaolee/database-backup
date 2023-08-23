@@ -25,11 +25,14 @@ pnpm install
 
 ```shell
 ./index.js backup create
+或者
+chmod a+x ./backup
+./backup.sh
 ```
 
 ## Deploy to Crontab
 
 ```crontab
-0 12 * * * /path/to/index.js create
-0 0 * * * /path/to/index.js create
+0 12 * * * /path/to/backup.sh
+0 0 * * * /path/to/backup.sh
 ```
